@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  ProductCenter:
+    image: mongo:latest
+    container_name: product-center
+    ports:
+      - 27013:27017
+    restart: on-failure
+
+  AuthService_DB:
+    image: postgres:latest
+    container_name: auth-server
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+    ports:
+      - 5432:5432
+    restart: on-failure
