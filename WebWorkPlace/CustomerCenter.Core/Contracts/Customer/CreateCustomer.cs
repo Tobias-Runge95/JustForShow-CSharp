@@ -2,7 +2,7 @@
 
 public class CreateCustomer
 {
-    public Guid UserId { get; set; }
+    public string Name { get; set; }
     public string Currency { get; set; }
     public string Street { get; set; }
     public string HouseNumber { get; set; }
@@ -13,7 +13,6 @@ public class CreateCustomer
     {
         return new Database.Models.Customer
         {
-            UserId = UserId,
             Country = Country,
             Currency = Currency,
             Street = Street,

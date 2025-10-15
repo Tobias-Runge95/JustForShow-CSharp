@@ -12,8 +12,7 @@ public static class Startup
 {
     public static IServiceCollection RegisterServices(this IServiceCollection service)
     {
-        return service
-            .AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
+        return service;
 
 
     }

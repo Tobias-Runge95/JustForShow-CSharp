@@ -1,24 +1,40 @@
 ﻿using CustomerCenter.Database.Models;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace CustomerCenter.Database;
 
-public class CustomerCenterDbContext
+public class CustomerCenterDbContext : DbContext
 {
-    private readonly IMongoClient _client;
-    private readonly IMongoDatabase _db;
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<People> Peoples { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<ProductionOrder> ProductionOrders { get; set; }
 
-    public CustomerCenterDbContext(string connectionString)
+    public CustomerCenterDbContext(DbContextOptions<CustomerCenterDbContext> options)
+        : base(options)
     {
-        _client = new MongoClient(connectionString);
-        _db = _client.GetDatabase("CustomerCenter");
-
-        Basket = _db.GetCollection<Basket>("Basket");
-        ShopHistory = _db.GetCollection<ShopHistory>("History");
-        Customer = _db.GetCollection<Customer>("Customer");
     }
-
-    public IMongoCollection<Basket> Basket { get; set; }
-    public IMongoCollection<ShopHistory> ShopHistory { get; set; }
-    public IMongoCollection<Customer> Customer { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.HasDefaultSchema("crm");
+        
+        var customer = builder.Entity<Customer>();
+        customer.HasKey(x => x.Id);
+        
+        var order = builder.Entity<Order>();
+        order.HasKey(x => x.Id);
+        order.HasOne(x => x.Customer).WithMany(x => x.Orders).HasForeignKey(x => x.CustomerId);
+        
+        var orderItem = builder.Entity<OrderItem>();
+        orderItem.HasKey(x => x.Id);
+        orderItem.HasOne(x => x.Order).WithMany(x => x.OrderItems).HasForeignKey(x => x.OrderId);
+        
+        var productionOrder = builder.Entity<ProductionOrder>();
+        productionOrder.HasKey(x => x.Id);
+        productionOrder.HasOne(x => x.OrderItem).WithOne(x => x.ProductionOrder).HasForeignKey<ProductionOrder>(x => x.OrderItemId);
+    }
 }
